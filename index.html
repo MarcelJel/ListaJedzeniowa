@@ -8,24 +8,10 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&amp;family=Playfair+Display:wght@700&amp;display=swap');
-        
-        body {
-            font-family: 'Inter', system_ui, sans-serif;
-        }
-        
-        .food-card {
-            transition: all 0.3s cubic-bezier(0.4, 0.0, 0.2, 1);
-        }
-        
-        .food-card:hover {
-            transform: translateY(-4px);
-            box-shadow: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1);
-        }
-
-        .done {
-            opacity: 0.7;
-        }
+        body { font-family: 'Inter', system_ui, sans-serif; }
+        .food-card { transition: all 0.3s cubic-bezier(0.4, 0.0, 0.2, 1); }
+        .food-card:hover { transform: translateY(-4px); box-shadow: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1); }
+        .done { opacity: 0.7; }
     </style>
 </head>
 <body class="bg-zinc-950 text-zinc-200">
@@ -38,23 +24,16 @@
                 </div>
                 <div>
                     <h1 class="text-3xl font-bold tracking-tighter">Nasza Food Lista</h1>
-                    <p class="text-xs text-zinc-500 -mt-1">Marcel + Kinga • wspólna lista</p>
+                    <p class="text-xs text-zinc-500 -mt-1">My + Twoja przyjaciółka • wspólna lista</p>
                 </div>
             </div>
-            
-            <div class="flex items-center gap-x-3">
-                <button onclick="showAddModal()"
-                        class="flex items-center gap-x-2 bg-rose-600 hover:bg-rose-700 transition-colors px-5 py-2.5 rounded-2xl text-sm font-semibold">
-                    <i class="fa-solid fa-plus mr-2"></i>
-                    <span>Dodaj miejsce</span>
-                </button>
-            </div>
+            <button onclick="showAddModal()" class="flex items-center gap-x-2 bg-rose-600 hover:bg-rose-700 px-5 py-2.5 rounded-2xl text-sm font-semibold">
+                <i class="fa-solid fa-plus mr-2"></i> <span>Dodaj miejsce</span>
+            </button>
         </div>
     </nav>
 
     <div class="max-w-6xl mx-auto px-6 pt-8 pb-16">
-        
-        <!-- Header -->
         <div class="flex flex-col md:flex-row md:items-end md:justify-between gap-y-4 mb-8">
             <div>
                 <div class="flex items-center gap-x-3 mb-2">
@@ -66,159 +45,100 @@
                 <h2 class="text-5xl font-bold tracking-tighter">Gdzie idziemy jeść?</h2>
                 <p class="text-zinc-400 mt-1">Lista miejsc, które chcemy wspólnie spróbować</p>
             </div>
-            
             <div class="flex items-center gap-x-8">
-                <div class="text-center">
-                    <div class="text-4xl font-semibold text-emerald-400" id="done-count">0</div>
-                    <div class="text-[10px] text-zinc-500 tracking-[1px]">SPRÓBOWANE</div>
-                </div>
-                <div class="text-center">
-                    <div class="text-4xl font-semibold text-rose-400" id="todo-count">0</div>
-                    <div class="text-[10px] text-zinc-500 tracking-[1px]">DO ZROBIENIA</div>
-                </div>
+                <div class="text-center"><div class="text-4xl font-semibold text-emerald-400" id="done-count">0</div><div class="text-[10px] text-zinc-500 tracking-[1px]">SPRÓBOWANE</div></div>
+                <div class="text-center"><div class="text-4xl font-semibold text-rose-400" id="todo-count">0</div><div class="text-[10px] text-zinc-500 tracking-[1px]">DO ZROBIENIA</div></div>
             </div>
         </div>
 
-        <!-- Filters + Refresh -->
         <div class="flex flex-col sm:flex-row gap-3 mb-6 items-center">
             <div class="flex-1 relative">
-                <input type="text" id="search-input" 
-                       onkeyup="filterList()"
-                       placeholder="Szukaj nazwy, kuchni lub komentarza..." 
-                       class="w-full bg-zinc-900 border border-zinc-800 focus:border-zinc-600 transition-colors rounded-3xl pl-11 py-[13px] text-sm placeholder:text-zinc-500">
+                <input type="text" id="search-input" onkeyup="filterList()" placeholder="Szukaj nazwy, kuchni lub komentarza..." 
+                       class="w-full bg-zinc-900 border border-zinc-800 focus:border-zinc-600 rounded-3xl pl-11 py-[13px] text-sm placeholder:text-zinc-500">
                 <i class="fa-solid fa-search absolute left-4.5 top-[15px] text-zinc-500"></i>
             </div>
-            
             <div class="flex gap-2 flex-wrap">
-                <button onclick="filterByStatus('all')" id="filter-all"
-                        class="px-5 py-3 text-sm font-medium rounded-3xl border border-zinc-700 bg-zinc-900 hover:border-zinc-600 transition-colors active:scale-[0.985]">
-                    Wszystkie
-                </button>
-                <button onclick="filterByStatus('todo')" id="filter-todo"
-                        class="px-5 py-3 text-sm font-medium rounded-3xl border border-zinc-700 bg-zinc-900 hover:border-zinc-600 transition-colors active:scale-[0.985]">
-                    Do spróbowania
-                </button>
-                <button onclick="filterByStatus('done')" id="filter-done"
-                        class="px-5 py-3 text-sm font-medium rounded-3xl border border-zinc-700 bg-zinc-900 hover:border-zinc-600 transition-colors active:scale-[0.985]">
-                    Spróbowane
-                </button>
-                
-                <button onclick="loadFromGoogleSheets()" 
-                        class="px-4 py-3 text-sm font-medium rounded-3xl border border-zinc-700 bg-zinc-900 hover:bg-zinc-800 flex items-center gap-x-2 transition-colors">
-                    <i class="fa-solid fa-sync-alt"></i>
-                    <span>Odśwież</span>
+                <button onclick="filterByStatus('all')" id="filter-all" class="px-5 py-3 text-sm font-medium rounded-3xl border border-zinc-700 bg-zinc-900">Wszystkie</button>
+                <button onclick="filterByStatus('todo')" id="filter-todo" class="px-5 py-3 text-sm font-medium rounded-3xl border border-zinc-700 bg-zinc-900">Do spróbowania</button>
+                <button onclick="filterByStatus('done')" id="filter-done" class="px-5 py-3 text-sm font-medium rounded-3xl border border-zinc-700 bg-zinc-900">Spróbowane</button>
+                <button onclick="loadFromGoogleSheets()" class="px-4 py-3 text-sm font-medium rounded-3xl border border-zinc-700 bg-zinc-900 flex items-center gap-x-2">
+                    <i class="fa-solid fa-sync-alt"></i> <span>Odśwież</span>
                 </button>
             </div>
         </div>
 
-        <!-- Lista -->
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5" id="places-list">
-            <!-- JS generuje karty -->
-        </div>
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5" id="places-list"></div>
         
-        <div class="mt-10 text-center">
-            <p class="text-xs text-zinc-500">
-                Dane pobierane z Google Sheets • Odśwież stronę lub kliknij "Odśwież", żeby zobaczyć nowe wpisy
-            </p>
+        <div class="mt-10 text-center text-xs text-zinc-500">
+            Dane z Google Sheets • Kliknij "Odśwież", żeby zobaczyć nowe wpisy z formularza
         </div>
     </div>
 
-    <!-- Modal dodawania -->
-    <div id="add-modal" onclick="if (event.target.id === 'add-modal') hideAddModal()"
-         class="hidden fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center z-[100]">
-        <div onclick="event.stopImmediatePropagation()" 
-             class="bg-zinc-900 border border-zinc-700 rounded-3xl w-full max-w-md mx-4 p-7 shadow-2xl">
-            
-            <div class="flex justify-between items-center mb-6">
-                <div>
-                    <h3 class="text-2xl font-semibold tracking-tight">Dodaj nowe miejsce</h3>
-                    <p class="text-xs text-zinc-400 mt-0.5">Zapisze się w Google Sheets</p>
-                </div>
-                <button onclick="hideAddModal()" class="text-zinc-400 hover:text-white text-2xl leading-none">×</button>
+    <!-- Modal -->
+    <div id="add-modal" onclick="if (event.target.id === 'add-modal') hideAddModal()" class="hidden fixed inset-0 bg-black/70 flex items-center justify-center z-[100]">
+        <div onclick="event.stopImmediatePropagation()" class="bg-zinc-900 border border-zinc-700 rounded-3xl w-full max-w-md mx-4 p-7">
+            <div class="flex justify-between mb-6">
+                <h3 class="text-2xl font-semibold">Dodaj nowe miejsce</h3>
+                <button onclick="hideAddModal()" class="text-3xl leading-none text-zinc-400">×</button>
             </div>
             
-            <div class="space-y-4">
-                <div class="bg-zinc-950 border border-zinc-800 rounded-2xl p-5 text-sm">
-                    <p class="text-zinc-400 mb-3">Najłatwiej dodać przez Google Formularz:</p>
-                    
-                    <a href="https://docs.google.com/forms/d/e/1FAIpQLScREU-s2TcpPK_8Qa7ZBm1Ch22NdtkMSbsuDdZQOIX3VfGFYg/viewform" target="_blank"
-                       class="flex items-center justify-center gap-x-2 w-full py-3.5 bg-white text-zinc-950 font-semibold rounded-2xl hover:bg-zinc-100 transition-colors">
-                        <i class="fa-solid fa-external-link-alt mr-2"></i>
-                        <span>Otwórz formularz dodawania</span>
-                    </a>
-                    
-                    <p class="text-[10px] text-center text-zinc-500 mt-3">Po wypełnieniu kliknij "Odśwież" na liście</p>
-                </div>
-                
-                <div class="text-center text-xs text-zinc-500">— lub —</div>
-                
-                <button onclick="addLocalOnly()"
-                        class="w-full py-3 text-sm border border-zinc-700 hover:bg-zinc-800 rounded-2xl transition-colors flex items-center justify-center gap-x-2">
-                    <i class="fa-solid fa-edit"></i>
-                    <span>Dodaj tylko u siebie (lokalnie)</span>
-                </button>
+            <div class="bg-zinc-950 border border-zinc-800 rounded-2xl p-5 text-sm mb-4">
+                <p class="text-zinc-400 mb-3">Użyj formularza Google (najwygodniej):</p>
+                <a href="https://docs.google.com/forms/d/e/1FAIpQLScREU-s2TcpPK_8Qa7ZBm1Ch22NdtkMSbsuDdZQOIX3VfGFYg/viewform" target="_blank"
+                   class="flex items-center justify-center gap-x-2 w-full py-3.5 bg-white text-zinc-950 font-semibold rounded-2xl">
+                    <i class="fa-solid fa-external-link-alt mr-2"></i> Otwórz formularz dodawania
+                </a>
+                <p class="text-[10px] text-center text-zinc-500 mt-3">Po wysłaniu formularza kliknij "Odśwież" na stronie</p>
             </div>
+            
+            <button onclick="addLocalOnly()" class="w-full py-3 text-sm border border-zinc-700 hover:bg-zinc-800 rounded-2xl flex items-center justify-center gap-x-2">
+                <i class="fa-solid fa-edit"></i> <span>Dodaj tylko u siebie (testowo)</span>
+            </button>
         </div>
     </div>
 
     <script>
-        // ============================================
-        // === KONFIGURACJA GOOGLE SHEETS ===
-        // ============================================
-        // 1. Stwórz Google Sheet
-        // 2. Kolumny: name | cuisine | location | link | note | done | suggestedBy
-        // 3. File → Share → Publish to web → CSV → Publish
-        // 4. Wklej link CSV poniżej
-
-        const GOOGLE_SHEETS_CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vSk7MDG0tESlt5KJoUPpGOF1oxAdYEKRNmv-XjoqNYrJ9awOve8XQB63OAwfW04xiwLVi7um6qPB7cJ/pub?output=csv";
+        // ==========================================
+        // WAŻNE: Wklej tutaj swój link CSV (nie edit link!)
+        // ==========================================
+        const GOOGLE_SHEETS_CSV_URL = "https://docs.google.com/spreadsheets/d/15OYU20mnOGxlaf9JsNDlXjsNrzloH_KhTEZJXJRciFQ/pub?output=csv&gid=0";
 
         let places = [];
         let currentFilter = 'all';
 
         async function loadFromGoogleSheets() {
             const container = document.getElementById('places-list');
-            container.innerHTML = `
-                <div class="col-span-full flex justify-center py-12">
-                    <div class="flex items-center gap-x-3 text-zinc-400">
-                        <i class="fa-solid fa-spinner fa-spin text-xl"></i>
-                        <span>Ładowanie listy z Google Sheets...</span>
-                    </div>
-                </div>
-            `;
+            container.innerHTML = `<div class="col-span-full flex justify-center py-12"><i class="fa-solid fa-spinner fa-spin text-xl mr-3"></i> Ładowanie z Google Sheets...</div>`;
 
             try {
-                const response = await fetch(GOOGLE_SHEETS_CSV_URL + '&t=' + new Date().getTime()); // cache bust
+                const response = await fetch(GOOGLE_SHEETS_CSV_URL + '&t=' + Date.now());
                 const csvText = await response.text();
-                
+
                 Papa.parse(csvText, {
                     header: true,
                     skipEmptyLines: true,
                     complete: function(results) {
-                        places = results.data.map((row, index) => ({
-                            id: index + 1,
-                            name: row.name || row.Name || '',
-                            cuisine: row.cuisine || row.Cuisine || '',
-                            location: row.location || row.Location || '',
-                            link: row.link || row.Link || '',
-                            note: row.note || row.Note || '',
-                            done: (row.done || row.Done || '').toString().toLowerCase() === 'true' || 
-                                  (row.done || row.Done || '') === '1',
-                            suggestedBy: row.suggestedBy || row['Suggested By'] || ''
-                        }));
-                        
+                        places = results.data.map((row, index) => {
+                            // Obsługujemy zarówno Twoje kolumny z formularza jak i standardowe
+                            return {
+                                id: index + 1,
+                                name: row.name || row.Name || row['Nazwa'] || '',
+                                cuisine: row.cuisine || row.Cuisine || row['Kuchnia'] || '',
+                                location: row.location || row.Location || row['Lokalizacja'] || '',
+                                link: row.link || row.Link || '',
+                                note: row.note || row.Note || row['Komentarz'] || '',
+                                done: false, // Na razie lokalnie (możesz dodać kolumnę "done" w Sheets)
+                                suggestedBy: row.suggestedBy || row['suggestedBy'] || row['Kto proponuje'] || ''
+                            };
+                        }).filter(p => p.name); // usuń puste wiersze
+
                         loadDoneStateFromLocalStorage();
                         renderPlaces();
                     }
                 });
-            } catch (error) {
-                console.error(error);
-                container.innerHTML = `
-                    <div class="col-span-full text-center py-10">
-                        <i class="fa-solid fa-exclamation-triangle text-4xl text-red-400 mb-4"></i>
-                        <p class="text-red-400">Błąd ładowania danych z Google Sheets</p>
-                        <p class="text-xs text-zinc-500 mt-2">Sprawdź czy arkusz jest opublikowany jako CSV</p>
-                    </div>
-                `;
+            } catch (err) {
+                console.error(err);
+                container.innerHTML = `<div class="col-span-full text-center py-10 text-red-400">Błąd ładowania. Sprawdź czy link CSV jest poprawny.</div>`;
             }
         }
 
@@ -226,9 +146,7 @@
             const saved = localStorage.getItem('foodListDoneStates');
             if (saved) {
                 const doneMap = JSON.parse(saved);
-                places.forEach(place => {
-                    if (doneMap[place.id]) place.done = true;
-                });
+                places.forEach(p => { if (doneMap[p.id]) p.done = true; });
             }
         }
 
@@ -238,46 +156,39 @@
             localStorage.setItem('foodListDoneStates', JSON.stringify(doneMap));
         }
 
-        function renderPlaces(filteredPlaces = places) {
+        function renderPlaces(filtered = places) {
             const container = document.getElementById('places-list');
             container.innerHTML = '';
-            
-            if (filteredPlaces.length === 0) {
-                container.innerHTML = `<div class="col-span-full text-center py-16 text-zinc-400">Brak wyników</div>`;
+
+            if (filtered.length === 0) {
+                container.innerHTML = `<div class="col-span-full text-center py-16 text-zinc-400">Brak miejsc</div>`;
                 return;
             }
-            
-            filteredPlaces.forEach(place => {
+
+            filtered.forEach(place => {
                 const card = document.createElement('div');
                 card.className = `food-card bg-zinc-900 border border-zinc-800 rounded-3xl p-6 flex flex-col ${place.done ? 'done' : ''}`;
-                
                 card.innerHTML = `
                     <div class="flex justify-between items-start mb-4">
                         <div class="flex-1">
                             <h3 class="font-semibold text-xl tracking-tight">${place.name}</h3>
                             ${place.cuisine ? `<span class="inline-block mt-1.5 px-3 py-px text-xs rounded-full bg-zinc-800">${place.cuisine}</span>` : ''}
                         </div>
-                        <label class="cursor-pointer ml-2">
+                        <label class="cursor-pointer ml-3">
                             <input type="checkbox" ${place.done ? 'checked' : ''} 
                                    onchange="toggleDone(${place.id}, this.checked)"
                                    class="accent-rose-600 w-[19px] h-[19px]">
                         </label>
                     </div>
-                    
-                    ${place.location ? `<div class="text-sm text-zinc-400 mb-3 flex items-center"><i class="fa-solid fa-map-marker-alt mr-2"></i>${place.location}</div>` : ''}
-                    
+                    ${place.location ? `<div class="text-sm text-zinc-400 mb-3"><i class="fa-solid fa-map-marker-alt mr-2"></i>${place.location}</div>` : ''}
                     ${place.note ? `<p class="text-sm text-zinc-300 mb-5 flex-1">${place.note}</p>` : '<div class="flex-1"></div>'}
-                    
-                    <div class="pt-4 border-t border-zinc-800 flex justify-between items-center text-sm">
-                        <div class="text-xs text-zinc-500">
-                            ${place.suggestedBy ? `Propozycja: <span class="font-medium text-zinc-300">${place.suggestedBy}</span>` : ''}
-                        </div>
-                        ${place.link ? `<a href="${place.link}" target="_blank" class="text-rose-400 hover:text-rose-300 flex items-center gap-x-1">Zobacz <i class="fa-solid fa-external-link-alt text-xs ml-1"></i></a>` : ''}
+                    <div class="pt-4 border-t border-zinc-800 flex justify-between text-sm">
+                        <div class="text-xs text-zinc-500">${place.suggestedBy ? `Propozycja: <span class="font-medium">${place.suggestedBy}</span>` : ''}</div>
+                        ${place.link ? `<a href="${place.link}" target="_blank" class="text-rose-400 flex items-center gap-x-1">Zobacz <i class="fa-solid fa-external-link-alt text-xs ml-1"></i></a>` : ''}
                     </div>
                 `;
                 container.appendChild(card);
             });
-            
             updateCounts();
         }
 
@@ -299,16 +210,13 @@
         function filterList() {
             const term = document.getElementById('search-input').value.toLowerCase().trim();
             let filtered = places;
-
             if (currentFilter === 'todo') filtered = filtered.filter(p => !p.done);
             else if (currentFilter === 'done') filtered = filtered.filter(p => p.done);
-
             if (term) {
-                filtered = filtered.filter(p =>
+                filtered = filtered.filter(p => 
                     (p.name && p.name.toLowerCase().includes(term)) ||
                     (p.cuisine && p.cuisine.toLowerCase().includes(term)) ||
-                    (p.note && p.note.toLowerCase().includes(term)) ||
-                    (p.location && p.location.toLowerCase().includes(term))
+                    (p.note && p.note.toLowerCase().includes(term))
                 );
             }
             renderPlaces(filtered);
@@ -316,9 +224,9 @@
 
         function filterByStatus(status) {
             currentFilter = status;
-            document.querySelectorAll('[id^="filter-"]').forEach(b => b.classList.remove('!bg-rose-600', '!border-rose-600', '!text-white'));
+            document.querySelectorAll('[id^="filter-"]').forEach(b => b.classList.remove('!bg-rose-600','!border-rose-600','!text-white'));
             const btn = document.getElementById('filter-' + status);
-            if (btn) btn.classList.add('!bg-rose-600', '!border-rose-600', '!text-white');
+            if (btn) btn.classList.add('!bg-rose-600','!border-rose-600','!text-white');
             filterList();
         }
 
@@ -326,7 +234,6 @@
             document.getElementById('add-modal').classList.remove('hidden');
             document.getElementById('add-modal').classList.add('flex');
         }
-        
         function hideAddModal() {
             document.getElementById('add-modal').classList.remove('flex');
             document.getElementById('add-modal').classList.add('hidden');
@@ -336,35 +243,32 @@
             hideAddModal();
             const name = prompt("Nazwa miejsca:");
             if (!name) return;
-
-            const newPlace = {
+            places.unshift({
                 id: Date.now(),
-                name: name,
+                name,
                 cuisine: prompt("Kuchnia?") || "",
-                location: prompt("Miasto/Lokalizacja?") || "",
-                link: prompt("Link do Maps?") || "",
+                location: prompt("Lokalizacja?") || "",
+                link: prompt("Link?") || "",
                 note: prompt("Komentarz?") || "",
                 done: false,
                 suggestedBy: "Ja"
-            };
-            places.unshift(newPlace);
+            });
             renderPlaces();
         }
 
         function init() {
-            document.getElementById('filter-all').classList.add('!bg-rose-600', '!border-rose-600', '!text-white');
+            document.getElementById('filter-all').classList.add('!bg-rose-600','!border-rose-600','!text-white');
 
-            if (GOOGLE_SHEETS_CSV_URL.includes('YOUR_SHEET_ID')) {
-                // Przykładowe dane jeśli nie ma konfiguracji
+            if (GOOGLE_SHEETS_CSV_URL.includes('YOUR_SHEET_ID') || GOOGLE_SHEETS_CSV_URL.includes('/edit?')) {
+                // Przykładowe dane + komunikat
                 places = [
-                    {id:1, name:"Stary Dom", cuisine:"Polska", location:"Warszawa", link:"", note:"Klasyczna polska kuchnia w starej kamienicy", done:false, suggestedBy:"Ja"},
-                    {id:2, name:"Trattoria da Vinci", cuisine:"Włoska", location:"Kraków, Kazimierz", link:"", note:"Prawdziwe włoskie dania i dobre wino", done:true, suggestedBy:"Przyjaciółka"},
-                    {id:3, name:"Ramen Lab", cuisine:"Azjatycka", location:"Warszawa", link:"", note:"Najlepszy ramen w mieście", done:false, suggestedBy:"Ja"}
+                    {id:1, name:"Stary Dom", cuisine:"Polska", location:"Warszawa", link:"", note:"Klasyczna polska kuchnia", done:false, suggestedBy:"Ja"},
+                    {id:2, name:"Trattoria da Vinci", cuisine:"Włoska", location:"Kraków", link:"", note:"Prawdziwe włoskie dania", done:true, suggestedBy:"Przyjaciółka"}
                 ];
                 renderPlaces();
                 setTimeout(() => {
-                    alert("⚠️ Wklej swój link CSV z Google Sheets w kodzie (zmienna GOOGLE_SHEETS_CSV_URL) żeby działało na żywo z synchronizacją.");
-                }, 800);
+                    alert("⚠️ Używasz linku edycyjnego zamiast CSV!\n\nWejdź w arkusz → Plik → Udostępnij → Publikuj w internecie → CSV i wklej ten link.");
+                }, 1200);
             } else {
                 loadFromGoogleSheets();
             }
