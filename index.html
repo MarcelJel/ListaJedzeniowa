@@ -1,0 +1,435 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nasza Food Lista 🍔</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&amp;family=Playfair+Display:wght@700&amp;display=swap');
+        
+        :root {
+            --primary: #e11d48;
+        }
+        
+        body {
+            font-family: 'Inter', system_ui, sans-serif;
+        }
+        
+        .title-font {
+            font-family: 'Playfair Display', Georgia, serif;
+        }
+
+        .food-card {
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        
+        .food-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1);
+        }
+
+        .done {
+            opacity: 0.75;
+        }
+
+        .nav-active {
+            color: #e11d48;
+            font-weight: 600;
+        }
+
+        .section-header {
+            font-size: 1.75rem;
+            font-weight: 700;
+            letter-spacing: -0.025em;
+        }
+    </style>
+</head>
+<body class="bg-zinc-950 text-zinc-200">
+    <!-- Navbar -->
+    <nav class="border-b border-zinc-800 bg-zinc-950 sticky top-0 z-50">
+        <div class="max-w-6xl mx-auto px-6 py-5 flex items-center justify-between">
+            <div class="flex items-center gap-x-3">
+                <div class="w-10 h-10 bg-rose-600 rounded-2xl flex items-center justify-center">
+                    <i class="fa-solid fa-utensils text-white text-2xl"></i>
+                </div>
+                <div>
+                    <h1 class="text-3xl font-bold tracking-tighter">Nasza Food Lista</h1>
+                    <p class="text-xs text-zinc-500 -mt-1">My + Twoja przyjaciółka</p>
+                </div>
+            </div>
+            
+            <div class="flex items-center gap-x-4">
+                <button onclick="showAddModal()"
+                        class="flex items-center gap-x-2 bg-rose-600 hover:bg-rose-700 transition-colors px-5 py-2.5 rounded-2xl text-sm font-semibold">
+                    <i class="fa-solid fa-plus mr-2"></i>
+                    <span>Dodaj miejsce</span>
+                </button>
+                
+                <a href="https://docs.google.com/forms/d/e/1FAIpQLS..." target="_blank"
+                   class="flex items-center gap-x-2 px-4 py-2.5 text-sm font-medium border border-zinc-700 hover:bg-zinc-900 rounded-2xl transition-colors">
+                    <i class="fa-solid fa-external-link-alt mr-2"></i>
+                    <span>Formularz Google</span>
+                </a>
+            </div>
+        </div>
+    </nav>
+
+    <div class="max-w-6xl mx-auto px-6 pt-10 pb-20">
+        
+        <!-- Header -->
+        <div class="flex flex-col md:flex-row md:items-end md:justify-between gap-y-4 mb-10">
+            <div>
+                <div class="flex items-center gap-x-3 mb-2">
+                    <div class="px-4 py-1.5 bg-zinc-900 rounded-full text-sm flex items-center gap-x-2 w-fit">
+                        <div class="w-2 h-2 bg-emerald-500 rounded-full animate-pulse"></div>
+                        <span class="text-emerald-400 font-medium">Wspólna lista</span>
+                    </div>
+                </div>
+                <h2 class="text-5xl font-bold tracking-tighter">Gdzie idziemy jeść?</h2>
+                <p class="text-zinc-400 mt-2 text-lg">Miejsca, które chcemy wspólnie spróbować</p>
+            </div>
+            
+            <div class="flex items-center gap-x-6 text-sm">
+                <div class="flex items-center gap-x-2">
+                    <div class="text-right">
+                        <div class="text-3xl font-semibold text-emerald-400" id="done-count">12</div>
+                        <div class="text-xs text-zinc-500 -mt-1">SPRÓBOWANE</div>
+                    </div>
+                </div>
+                <div class="w-px h-8 bg-zinc-800"></div>
+                <div class="flex items-center gap-x-2">
+                    <div class="text-right">
+                        <div class="text-3xl font-semibold text-rose-400" id="todo-count">24</div>
+                        <div class="text-xs text-zinc-500 -mt-1">DO ZROBIENIA</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Filters -->
+        <div class="flex flex-col sm:flex-row gap-3 mb-8">
+            <div class="flex-1 relative">
+                <input type="text" id="search-input" 
+                       onkeyup="filterList()"
+                       placeholder="Szukaj miejsca lub kuchni..." 
+                       class="w-full bg-zinc-900 border border-zinc-800 focus:border-zinc-700 transition-colors rounded-3xl pl-12 py-3.5 text-sm placeholder:text-zinc-500">
+                <i class="fa-solid fa-search absolute left-5 top-4 text-zinc-500"></i>
+            </div>
+            
+            <div class="flex gap-2">
+                <button onclick="filterByStatus('all')" id="filter-all"
+                        class="px-5 py-3 rounded-3xl text-sm font-medium bg-zinc-900 border border-zinc-700 hover:border-zinc-600 active:bg-zinc-800 transition-colors">
+                    Wszystkie
+                </button>
+                <button onclick="filterByStatus('todo')" id="filter-todo"
+                        class="px-5 py-3 rounded-3xl text-sm font-medium bg-zinc-900 border border-zinc-700 hover:border-zinc-600 active:bg-zinc-800 transition-colors">
+                    Do spróbowania
+                </button>
+                <button onclick="filterByStatus('done')" id="filter-done"
+                        class="px-5 py-3 rounded-3xl text-sm font-medium bg-zinc-900 border border-zinc-700 hover:border-zinc-600 active:bg-zinc-800 transition-colors">
+                    Spróbowane
+                </button>
+            </div>
+        </div>
+
+        <!-- Lista miejsc -->
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5" id="places-list">
+            <!-- Wygenerowane dynamicznie przez JS -->
+        </div>
+        
+        <div class="mt-8 text-center text-xs text-zinc-500">
+            Dane są synchronizowane z Google Sheets • Odśwież stronę, żeby zobaczyć nowe wpisy
+        </div>
+    </div>
+
+    <!-- Modal dodawania -->
+    <div id="add-modal" onclick="if (event.target.id === 'add-modal') hideAddModal()"
+         class="hidden fixed inset-0 bg-black/70 flex items-center justify-center z-[100]">
+        <div onclick="event.stopImmediatePropagation()" 
+             class="bg-zinc-900 border border-zinc-700 rounded-3xl w-full max-w-md mx-4 p-7">
+            
+            <div class="flex justify-between items-center mb-6">
+                <h3 class="text-xl font-semibold">Dodaj nowe miejsce</h3>
+                <button onclick="hideAddModal()" class="text-zinc-400 hover:text-white">
+                    <i class="fa-solid fa-times text-xl"></i>
+                </button>
+            </div>
+            
+            <form id="add-form" onsubmit="addNewPlace(event)">
+                <div class="space-y-5">
+                    <!-- Nazwa -->
+                    <div>
+                        <label class="block text-sm font-medium mb-1.5 text-zinc-400">Nazwa miejsca / restauracji *</label>
+                        <input type="text" id="name" required
+                               class="w-full bg-zinc-950 border border-zinc-700 focus:border-rose-600 rounded-2xl px-4 py-3 text-sm">
+                    </div>
+                    
+                    <!-- Kuchnia -->
+                    <div>
+                        <label class="block text-sm font-medium mb-1.5 text-zinc-400">Kuchnia</label>
+                        <select id="cuisine" class="w-full bg-zinc-950 border border-zinc-700 focus:border-rose-600 rounded-2xl px-4 py-3 text-sm">
+                            <option value="">Wybierz...</option>
+                            <option value="Polska">Polska</option>
+                            <option value="Włoska">Włoska</option>
+                            <option value="Azjatycka">Azjatycka</option>
+                            <option value="Amerykańska">Amerykańska</option>
+                            <option value="Meksykańska">Meksykańska</option>
+                            <option value="Indyjska">Indyjska</option>
+                            <option value="Inna">Inna</option>
+                        </select>
+                    </div>
+                    
+                    <div class="grid grid-cols-2 gap-4">
+                        <!-- Lokalizacja -->
+                        <div>
+                            <label class="block text-sm font-medium mb-1.5 text-zinc-400">Miasto / Lokalizacja</label>
+                            <input type="text" id="location" placeholder="Warszawa, Kraków..."
+                                   class="w-full bg-zinc-950 border border-zinc-700 focus:border-rose-600 rounded-2xl px-4 py-3 text-sm">
+                        </div>
+                        
+                        <!-- Link -->
+                        <div>
+                            <label class="block text-sm font-medium mb-1.5 text-zinc-400">Link (Google Maps / strona)</label>
+                            <input type="url" id="link" placeholder="https://..."
+                                   class="w-full bg-zinc-950 border border-zinc-700 focus:border-rose-600 rounded-2xl px-4 py-3 text-sm">
+                        </div>
+                    </div>
+                    
+                    <div>
+                        <label class="block text-sm font-medium mb-1.5 text-zinc-400">Krótki komentarz / dlaczego chcemy tam iść</label>
+                        <textarea id="note" rows="2" placeholder="Super recenzje na Google..."
+                                  class="w-full bg-zinc-950 border border-zinc-700 focus:border-rose-600 rounded-2xl px-4 py-3 text-sm resize-y"></textarea>
+                    </div>
+                    
+                    <div class="flex items-center gap-x-2 pt-2">
+                        <input type="checkbox" id="suggested-by-me" class="accent-rose-600 w-4 h-4">
+                        <label for="suggested-by-me" class="text-sm text-zinc-400">Ja proponuję to miejsce</label>
+                    </div>
+                </div>
+                
+                <div class="flex gap-3 mt-8">
+                    <button type="button" onclick="hideAddModal()"
+                            class="flex-1 py-3 rounded-2xl border border-zinc-700 hover:bg-zinc-800 transition-colors text-sm font-medium">
+                        Anuluj
+                    </button>
+                    <button type="submit"
+                            class="flex-1 py-3 rounded-2xl bg-rose-600 hover:bg-rose-700 transition-colors text-sm font-semibold">
+                        Dodaj do listy
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        // === KONFIGURACJA ===
+        // Tutaj później podłączysz Google Sheets
+        let places = [
+            {
+                id: 1,
+                name: "Stary Dom",
+                cuisine: "Polska",
+                location: "Warszawa, Śródmieście",
+                link: "https://maps.app.goo.gl/xxx",
+                note: "Klasyczna polska kuchnia w pięknej kamienicy",
+                done: false,
+                suggestedBy: "Ja"
+            },
+            {
+                id: 2,
+                name: "Trattoria da Vinci",
+                cuisine: "Włoska",
+                location: "Kraków, Kazimierz",
+                link: "",
+                note: "Prawdziwe włoskie dania i wino",
+                done: true,
+                suggestedBy: "Przyjaciółka"
+            },
+            {
+                id: 3,
+                name: "Ramen Lab",
+                cuisine: "Azjatycka",
+                location: "Warszawa",
+                link: "",
+                note: "Najlepszy ramen w mieście według recenzji",
+                done: false,
+                suggestedBy: "Ja"
+            }
+        ];
+
+        let currentFilter = 'all';
+
+        function renderPlaces(filteredPlaces = places) {
+            const container = document.getElementById('places-list');
+            container.innerHTML = '';
+            
+            if (filteredPlaces.length === 0) {
+                container.innerHTML = `
+                    <div class="col-span-full text-center py-12">
+                        <i class="fa-solid fa-search text-4xl text-zinc-700 mb-4"></i>
+                        <p class="text-zinc-400">Nic nie znaleziono</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            filteredPlaces.forEach(place => {
+                const card = document.createElement('div');
+                card.className = `food-card bg-zinc-900 border border-zinc-800 rounded-3xl p-6 flex flex-col ${place.done ? 'done' : ''}`;
+                
+                card.innerHTML = `
+                    <div class="flex justify-between items-start mb-4">
+                        <div>
+                            <h3 class="font-semibold text-xl tracking-tight">${place.name}</h3>
+                            ${place.cuisine ? `<span class="inline-block mt-1 px-3 py-0.5 text-xs rounded-full bg-zinc-800 text-zinc-400">${place.cuisine}</span>` : ''}
+                        </div>
+                        
+                        <div class="flex items-center">
+                            <label class="flex items-center cursor-pointer">
+                                <input type="checkbox" ${place.done ? 'checked' : ''} 
+                                       onchange="toggleDone(${place.id}, this.checked)"
+                                       class="accent-rose-600 w-[18px] h-[18px]">
+                                <span class="ml-2 text-xs text-zinc-400">Spróbowane</span>
+                            </label>
+                        </div>
+                    </div>
+                    
+                    ${place.location ? `
+                        <div class="flex items-center text-sm text-zinc-400 mb-2">
+                            <i class="fa-solid fa-map-marker-alt mr-2 w-4"></i>
+                            <span>${place.location}</span>
+                        </div>
+                    ` : ''}
+                    
+                    ${place.note ? `
+                        <p class="text-sm text-zinc-300 mb-4 flex-1">${place.note}</p>
+                    ` : '<div class="flex-1"></div>'}
+                    
+                    <div class="flex items-center justify-between mt-auto pt-4 border-t border-zinc-800">
+                        <div class="text-xs text-zinc-500">
+                            ${place.suggestedBy ? `Propozycja: <span class="font-medium">${place.suggestedBy}</span>` : ''}
+                        </div>
+                        
+                        ${place.link ? `
+                            <a href="${place.link}" target="_blank" 
+                               class="text-rose-400 hover:text-rose-300 transition-colors text-sm flex items-center gap-x-1">
+                                <span>Zobacz</span>
+                                <i class="fa-solid fa-arrow-up-right-from-square text-xs"></i>
+                            </a>
+                        ` : ''}
+                    </div>
+                `;
+                
+                container.appendChild(card);
+            });
+            
+            updateCounts();
+        }
+
+        function updateCounts() {
+            const done = places.filter(p => p.done).length;
+            const todo = places.length - done;
+            
+            document.getElementById('done-count').textContent = done;
+            document.getElementById('todo-count').textContent = todo;
+        }
+
+        function toggleDone(id, isDone) {
+            const place = places.find(p => p.id === id);
+            if (place) {
+                place.done = isDone;
+                renderPlaces();
+            }
+        }
+
+        function filterList() {
+            const searchTerm = document.getElementById('search-input').value.toLowerCase();
+            
+            let filtered = places;
+            
+            if (currentFilter === 'todo') {
+                filtered = filtered.filter(p => !p.done);
+            } else if (currentFilter === 'done') {
+                filtered = filtered.filter(p => p.done);
+            }
+            
+            if (searchTerm) {
+                filtered = filtered.filter(p => 
+                    p.name.toLowerCase().includes(searchTerm) || 
+                    (p.cuisine && p.cuisine.toLowerCase().includes(searchTerm)) ||
+                    (p.note && p.note.toLowerCase().includes(searchTerm))
+                );
+            }
+            
+            renderPlaces(filtered);
+        }
+
+        function filterByStatus(status) {
+            currentFilter = status;
+            
+            // Zmieniamy style przycisków
+            document.querySelectorAll('[id^="filter-"]').forEach(btn => {
+                btn.classList.remove('!bg-rose-600', '!border-rose-600', 'text-white');
+                btn.classList.add('bg-zinc-900', 'border-zinc-700');
+            });
+            
+            const activeBtn = document.getElementById(`filter-${status}`);
+            if (activeBtn) {
+                activeBtn.classList.remove('bg-zinc-900', 'border-zinc-700');
+                activeBtn.classList.add('!bg-rose-600', '!border-rose-600', 'text-white');
+            }
+            
+            filterList();
+        }
+
+        function showAddModal() {
+            document.getElementById('add-modal').classList.remove('hidden');
+            document.getElementById('add-modal').classList.add('flex');
+        }
+        
+        function hideAddModal() {
+            document.getElementById('add-modal').classList.remove('flex');
+            document.getElementById('add-modal').classList.add('hidden');
+            document.getElementById('add-form').reset();
+        }
+
+        function addNewPlace(e) {
+            e.preventDefault();
+            
+            const newPlace = {
+                id: Date.now(),
+                name: document.getElementById('name').value,
+                cuisine: document.getElementById('cuisine').value,
+                location: document.getElementById('location').value,
+                link: document.getElementById('link').value,
+                note: document.getElementById('note').value,
+                done: false,
+                suggestedBy: document.getElementById('suggested-by-me').checked ? "Ja" : "Przyjaciółka"
+            };
+            
+            places.unshift(newPlace);
+            renderPlaces();
+            hideAddModal();
+            
+            // TODO: W przyszłości tutaj dodamy zapis do Google Sheets
+            alert("Miejsce zostało dodane lokalnie. W wersji z Google Sheets będzie automatycznie zapisywane online.");
+        }
+
+        // Inicjalizacja
+        function init() {
+            // Domyślny filtr
+            document.getElementById('filter-all').classList.add('!bg-rose-600', '!border-rose-600', 'text-white');
+            
+            renderPlaces();
+            
+            // Przykład: po 5 sekundach pokazujemy, że lista się odświeżyła
+            // (w prawdziwej wersji z Sheets będzie to fetch)
+        }
+
+        // Uruchomienie
+        window.onload = init;
+    </script>
+</body>
+</html>
